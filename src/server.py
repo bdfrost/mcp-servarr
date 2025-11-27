@@ -447,7 +447,7 @@ class SonarrRadarrMCP:
     async def get_recent_series(self, days: int = 7) -> str:
         """Get recently added series"""
         series = await self.sonarr_client.get("series")
-        cutoff_date = datetime.now() - timedelta(days=days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
         
         recent = []
         for show in series:
@@ -571,7 +571,7 @@ class SonarrRadarrMCP:
     async def get_recent_movies(self, days: int = 7) -> str:
         """Get recently added movies"""
         movies = await self.radarr_client.get("movie")
-        cutoff_date = datetime.now() - timedelta(days=days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
         
         recent = []
         for movie in movies:
