@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mcp-servarr
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mcp_servarr-secrets
+  namespace: mcp-servarr
+type: Opaque
+stringData:
+  SONARR_URL: "http://sonarr:8989"
+  SONARR_API_KEY: "your-sonarr-api-key-here"
+  RADARR_URL: "http://radarr:7878"
+  RADARR_API_KEY: "your-radarr-api-key-here"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp_servarr-config
+  namespace: mcp-servarr
+data:
+  REQUEST_TIMEOUT: "30"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp_servarr
+  namespace: mcp-servarr
+  labels:
+    app: mcp_servarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp_servarr
+  template:
+    metadata:
+      labels:
+        app: mcp_servarr
+    spec:
+      # Security context for the pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      
+      containers:
+      - name: mcp-server
+        image: mcp_servarr:latest
+        imagePullPolicy: IfNotPresent
+        
+        # Security context for the container
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+              - ALL
+        
+        # Environment variables from secrets and configmaps
+        env:
+        - name: SONARR_URL
+          valueFrom:
+            secretKeyRef:
+              name: mcp_servarr-secrets
+              key: SONARR_URL
+        - name: SONARR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mcp_servarr-secrets
+              key: SONARR_API_KEY
+        - name: RADARR_URL
+          valueFrom:
+            secretKeyRef:
+              name: mcp_servarr-secrets
+              key: RADARR_URL
+        - name: RADARR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mcp_servarr-secrets
+              key: RADARR_API_KEY
+        - name: REQUEST_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: mcp_servarr-config
+              key: REQUEST_TIMEOUT
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        
+        # Liveness probe
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Temporary directories for read-only root filesystem
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: home
+          mountPath: /home/mcp
+      
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: home
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp_servarr
+  namespace: mcp-servarr
+  labels:
+    app: mcp_servarr
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: stdio
+  selector:
+    app: mcp_servarr
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mcp_servarr-netpol
+  namespace: mcp-servarr
+spec:
+  podSelector:
+    matchLabels:
+      app: mcp_servarr
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: mcp-servarr
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow traffic to Sonarr and Radarr
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 8989  # Sonarr
+    - protocol: TCP
+      port: 7878  # Radarr
