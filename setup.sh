@@ -109,7 +109,7 @@ echo ""
 case $DEPLOY_METHOD in
     1)
         echo "Building and starting with Docker Compose..."
-        docker build -t mcp_servarr:latest .
+        docker build -t mcp-servarr:latest .
         docker-compose up -d
         echo ""
         echo -e "${GREEN}✓${NC} MCP server started with Docker Compose"
@@ -126,14 +126,14 @@ case $DEPLOY_METHOD in
         
         # Build image
         echo "Building Docker image..."
-        docker build -t mcp_servarr:latest .
+        docker build -t mcp-servarr:latest .
         
         # Create namespace
         kubectl create namespace mcp-servarr --dry-run=client -o yaml | kubectl apply -f -
         
         # Create secret
         echo "Creating Kubernetes secret..."
-        kubectl create secret generic mcp_servarr-secrets \
+        kubectl create secret generic mcp-servarr-secrets \
             --namespace=mcp-servarr \
             --from-literal=SONARR_URL="${SONARR_URL}" \
             --from-literal=SONARR_API_KEY="${SONARR_API_KEY}" \
@@ -148,7 +148,7 @@ case $DEPLOY_METHOD in
         echo ""
         echo -e "${GREEN}✓${NC} Deployed to Kubernetes"
         echo "Check status: kubectl get pods -n mcp-servarr"
-        echo "View logs: kubectl logs -n mcp-servarr -l app=mcp_servarr -f"
+        echo "View logs: kubectl logs -n mcp-servarr -l app=mcp-servarr -f"
         ;;
     3)
         echo "Setting up Python development environment..."
@@ -192,7 +192,7 @@ echo '   {
          "args": [
            "run", "--rm", "-i",
            "--env-file", "'$(pwd)'/.env",
-           "mcp_servarr:latest"
+           "mcp-servarr:latest"
          ]
        }
      }

@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  mcp_servarr:
+  mcp-servarr:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mcp_servarr
+    container_name: mcp-servarr
     
     # Security settings
     security_opt:

@@ -49,7 +49,7 @@ This MCP server is built with security as a priority:
 
 ```bash
 git clone <your-repo-url>
-cd mcp_servarr
+cd mcp-servarr
 ```
 
 ### 2. Set Up Environment Variables
@@ -79,7 +79,7 @@ RADARR_API_KEY=your-radarr-api-key
 ### 3. Build the Docker Image
 
 ```bash
-docker build -t mcp_servarr:latest .
+docker build -t mcp-servarr:latest .
 ```
 
 ### 4. Test Locally with Docker Compose
@@ -105,7 +105,7 @@ stringData:
 **Security Note:** For production, use `kubectl create secret` instead of storing secrets in YAML:
 
 ```bash
-kubectl create secret generic mcp_servarr-secrets \
+kubectl create secret generic mcp-servarr-secrets \
   --namespace=mcp-servarr \
   --from-literal=SONARR_URL='http://sonarr:8989' \
   --from-literal=SONARR_API_KEY='your-key' \
@@ -123,7 +123,7 @@ kubectl apply -f k8s/deployment.yaml
 
 ```bash
 kubectl get pods -n mcp-servarr
-kubectl logs -n mcp-servarr deployment/mcp_servarr
+kubectl logs -n mcp-servarr deployment/mcp-servarr
 ```
 
 ## Connecting to Claude
@@ -144,7 +144,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
         "--rm",
         "-i",
         "--env-file", "/path/to/your/.env",
-        "mcp_servarr:latest"
+        "mcp-servarr:latest"
       ]
     }
   }
@@ -159,7 +159,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
     "mcp-servarr": {
       "command": "python",
       "args": [
-        "/path/to/mcp_servarr/src/server.py"
+        "/path/to/mcp-servarr/src/server.py"
       ],
       "env": {
         "SONARR_URL": "http://localhost:8989",

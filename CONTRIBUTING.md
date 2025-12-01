@@ -23,8 +23,8 @@ Thank you for your interest in contributing! This document provides guidelines a
 1. Fork the repository
 2. Clone your fork:
 ```bash
-git clone https://github.com/your-username/mcp_servarr.git
-cd mcp_servarr
+git clone https://github.com/your-username/mcp-servarr.git
+cd mcp-servarr
 ```
 
 3. Create a virtual environment:

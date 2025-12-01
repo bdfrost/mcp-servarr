@@ -1,7 +1,7 @@
 .PHONY: build run test clean deploy k8s-deploy k8s-delete help
 
 # Variables
-IMAGE_NAME := mcp_servarr
+IMAGE_NAME := mcp-servarr
 IMAGE_TAG := latest
 NAMESPACE := mcp-servarr
 
@@ -40,13 +40,13 @@ k8s-delete: ## Delete from Kubernetes
 	kubectl delete -f k8s/deployment.yaml
 
 k8s-logs: ## View Kubernetes logs
-	kubectl logs -n $(NAMESPACE) -l app=mcp_servarr -f
+	kubectl logs -n $(NAMESPACE) -l app=mcp-servarr -f
 
 k8s-status: ## Check Kubernetes deployment status
 	kubectl get all -n $(NAMESPACE)
 
 k8s-describe: ## Describe Kubernetes deployment
-	kubectl describe deployment mcp_servarr -n $(NAMESPACE)
+	kubectl describe deployment mcp-servarr -n $(NAMESPACE)
 
 lint: ## Run Python linter
 	python -m flake8 src/ --max-line-length=120
