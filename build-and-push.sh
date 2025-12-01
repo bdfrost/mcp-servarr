@@ -59,7 +59,7 @@ echo ""
 
 # Build the image
 echo -e "${GREEN}➤${NC} Building ${IMAGE_NAME}:${VERSION}..."
-podman build \
+podman build --platform linux/amd64 \
   -t ${IMAGE_FULL}:${VERSION} \
   -t ${IMAGE_FULL}:latest \
   .

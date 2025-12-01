@@ -51,8 +51,8 @@ spec:
       
       containers:
       - name: mcp-server
-        image: mcp-servarr:latest
-        imagePullPolicy: IfNotPresent
+        image: ghcr.io/bdfrost/mcp-servarr:latest
+        imagePullPolicy: Always
         
         # Security context for the container
         securityContext:
