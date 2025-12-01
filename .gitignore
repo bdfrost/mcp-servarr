@@ -1,5 +1,6 @@
 .claude
 .env
+.github-token
 /.project
 /.idea/
 /.vscode/
@@ -7,3 +8,4 @@
 *.DS_Store
 charts/*
 *.iml
+CLAUDE.md

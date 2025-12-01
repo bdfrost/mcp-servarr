@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  mcp-servarr:
+  mcp-servarr-local:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: mcp-servarr-http
+      dockerfile: Dockerfile.local
+    container_name: mcp-servarr-local
 
     # Security settings
     security_opt:
@@ -14,9 +14,9 @@ services:
     cap_drop:
       - ALL
 
-    # Expose HTTP port
-    ports:
-      - "8080:8080"
+    # Interactive mode for stdio
+    stdin_open: true
+    tty: true
 
     environment:
       # Configure these with your actual values
@@ -25,7 +25,6 @@ services:
       - RADARR_URL=${RADARR_URL:-http://radarr:7878}
       - RADARR_API_KEY=${RADARR_API_KEY}
       - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30}
-      - PORT=8080
 
     # Temporary directories for read-only filesystem
     tmpfs:
@@ -42,16 +41,13 @@ services:
           cpus: '0.1'
           memory: 128M
 
-    # Restart policy
-    restart: unless-stopped
-
-    # Health check using HTTP endpoint
+    # Health check
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health').read()"]
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 10s
+      start_period: 5s
 
     # Network
     networks:

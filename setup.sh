@@ -182,7 +182,7 @@ echo "Next Steps"
 echo "=================================="
 echo ""
 echo "1. Configure Claude Desktop to use this MCP server"
-echo "   Location: ~/Library/Application Support/Claude/claude_desktop_config.json"
+echo "   Location: ~/Library/Application\ Support/Claude/claude_desktop_config.json"
 echo ""
 echo "2. Add this configuration:"
 echo '   {
