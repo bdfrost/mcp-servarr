@@ -1,0 +1,9 @@
+.claude
+.env
+/.project
+/.idea/
+/.vscode/
+*.pem
+*.DS_Store
+charts/*
+*.iml
