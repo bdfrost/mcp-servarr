@@ -6,7 +6,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mcp_servarr-secrets
+  name: mcp-servarr-secrets
   namespace: mcp-servarr
 type: Opaque
 stringData:
@@ -18,7 +18,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mcp_servarr-config
+  name: mcp-servarr-config
   namespace: mcp-servarr
 data:
   REQUEST_TIMEOUT: "30"
@@ -26,19 +26,19 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mcp_servarr
+  name: mcp-servarr
   namespace: mcp-servarr
   labels:
-    app: mcp_servarr
+    app: mcp-servarr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mcp_servarr
+      app: mcp-servarr
   template:
     metadata:
       labels:
-        app: mcp_servarr
+        app: mcp-servarr
     spec:
       # Security context for the pod
       securityContext:
@@ -51,7 +51,7 @@ spec:
       
       containers:
       - name: mcp-server
-        image: mcp_servarr:latest
+        image: mcp-servarr:latest
         imagePullPolicy: IfNotPresent
         
         # Security context for the container
@@ -69,27 +69,27 @@ spec:
         - name: SONARR_URL
           valueFrom:
             secretKeyRef:
-              name: mcp_servarr-secrets
+              name: mcp-servarr-secrets
               key: SONARR_URL
         - name: SONARR_API_KEY
           valueFrom:
             secretKeyRef:
-              name: mcp_servarr-secrets
+              name: mcp-servarr-secrets
               key: SONARR_API_KEY
         - name: RADARR_URL
           valueFrom:
             secretKeyRef:
-              name: mcp_servarr-secrets
+              name: mcp-servarr-secrets
               key: RADARR_URL
         - name: RADARR_API_KEY
           valueFrom:
             secretKeyRef:
-              name: mcp_servarr-secrets
+              name: mcp-servarr-secrets
               key: RADARR_API_KEY
         - name: REQUEST_TIMEOUT
           valueFrom:
             configMapKeyRef:
-              name: mcp_servarr-config
+              name: mcp-servarr-config
               key: REQUEST_TIMEOUT
         
         # Resource limits and requests
@@ -141,10 +141,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mcp_servarr
+  name: mcp-servarr
   namespace: mcp-servarr
   labels:
-    app: mcp_servarr
+    app: mcp-servarr
 spec:
   type: ClusterIP
   ports:
@@ -153,17 +153,17 @@ spec:
     protocol: TCP
     name: stdio
   selector:
-    app: mcp_servarr
+    app: mcp-servarr
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: mcp_servarr-netpol
+  name: mcp-servarr-netpol
   namespace: mcp-servarr
 spec:
   podSelector:
     matchLabels:
-      app: mcp_servarr
+      app: mcp-servarr
   policyTypes:
   - Ingress
   - Egress

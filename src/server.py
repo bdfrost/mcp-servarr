@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("mcp_servarr")
+logger = logging.getLogger("mcp-servarr")
 
 
 class Config(BaseModel):
@@ -131,7 +131,7 @@ class SonarrRadarrMCP:
     
     def __init__(self):
         self.config = Config.from_env()
-        self.server = Server("mcp_servarr")
+        self.server = Server("mcp-servarr")
         self.sonarr_client: Optional[APIClient] = None
         self.radarr_client: Optional[APIClient] = None
         
