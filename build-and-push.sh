@@ -158,6 +158,13 @@ else
         echo -e "${RED}✗ Manifest creation failed${NC}"
         exit 1
     fi
+
+    # Inspect manifests to verify they're correct
+    echo -e "${GREEN}  ➤${NC} Inspecting manifests..."
+    echo -e "${BLUE}Manifest for ${VERSION}:${NC}"
+    podman manifest inspect ${IMAGE_FULL}:${VERSION} | grep -E "(schemaVersion|manifests|platform)" || true
+    echo -e "${BLUE}Manifest for latest:${NC}"
+    podman manifest inspect ${IMAGE_FULL}:latest | grep -E "(schemaVersion|manifests|platform)" || true
 fi
 
 echo -e "${GREEN}✓${NC} Build successful"
@@ -222,22 +229,38 @@ if [ "$CONTAINER_TOOL" = "docker" ]; then
 else
     # Podman manifest push
     echo -e "${GREEN}➤${NC} Pushing ${IMAGE_FULL}:${VERSION} manifest..."
-    podman manifest push ${IMAGE_FULL}:${VERSION} docker://${IMAGE_FULL}:${VERSION}
+    podman manifest push --all ${IMAGE_FULL}:${VERSION} docker://${IMAGE_FULL}:${VERSION}
 
     if [ $? -ne 0 ]; then
-        echo -e "${RED}✗ Push failed${NC}"
-        exit 1
+        echo -e "${RED}✗ Push failed for ${VERSION}${NC}"
+        echo -e "${YELLOW}Trying alternative push method...${NC}"
+        # Alternative: push individual images then the manifest
+        podman push ${IMAGE_FULL}:${VERSION}-amd64
+        podman push ${IMAGE_FULL}:${VERSION}-arm64
+        podman manifest push --all ${IMAGE_FULL}:${VERSION} docker://${IMAGE_FULL}:${VERSION}
+
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}✗ Push failed${NC}"
+            exit 1
+        fi
     fi
 
     echo -e "${GREEN}✓${NC} Pushed version ${VERSION}"
 
     # Push latest manifest
     echo -e "${GREEN}➤${NC} Pushing ${IMAGE_FULL}:latest manifest..."
-    podman manifest push ${IMAGE_FULL}:latest docker://${IMAGE_FULL}:latest
+    podman manifest push --all ${IMAGE_FULL}:latest docker://${IMAGE_FULL}:latest
 
     if [ $? -ne 0 ]; then
-        echo -e "${RED}✗ Push failed${NC}"
-        exit 1
+        echo -e "${RED}✗ Push failed for latest${NC}"
+        echo -e "${YELLOW}Trying alternative push method...${NC}"
+        # The individual images are already pushed, just push the manifest
+        podman manifest push --all ${IMAGE_FULL}:latest docker://${IMAGE_FULL}:latest
+
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}✗ Push failed${NC}"
+            exit 1
+        fi
     fi
 
     echo -e "${GREEN}✓${NC} Pushed latest tag"
