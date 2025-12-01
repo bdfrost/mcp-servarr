@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 VERSION="${1}"
 GITHUB_USERNAME="${2:-${GITHUB_USERNAME}}"
-IMAGE_NAME="sonarr-radarr-mcp"
+IMAGE_NAME="mcp-servarr"
 REGISTRY="ghcr.io"
 
 # Validation
