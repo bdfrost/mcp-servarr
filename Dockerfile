@@ -28,5 +28,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Set Python to run in unbuffered mode for better logging
 ENV PYTHONUNBUFFERED=1
 
-# Run the MCP server
-ENTRYPOINT ["python", "-u", "src/server.py"]
+# Run the HTTP server (use server.py for stdio mode)
+ENTRYPOINT ["python", "-u", "src/http_server.py"]
